@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -44,7 +45,7 @@ func main() {
 	flag.StringVar(&redirectURI, "redirect", "http://localhost:3001/token", "Application redirect URI")
 
 	var state string
-	flag.StringVar(&state, "auth_code", "", "Authorization Code, '&code=' querystring")
+	flag.StringVar(&state, "state", "", "Request state")
 
 	var scope string
 	flag.StringVar(&scope, "scope", "openid user.read", "Authorization Scope")
@@ -54,6 +55,10 @@ func main() {
 	if clientID == "" || clientSecret == "" {
 		flag.Usage()
 		return
+	}
+
+	if state == "" {
+		state = generateRandomString(20)
 	}
 
 	opts := ExecOpts{
@@ -142,4 +147,20 @@ func getAccessToken(tenant, clientId, scope, code, clientSecret, redirectURI str
 	logger.Print().Msgf("access token response: %#v", respBody)
 
 	return respBody
+}
+
+func generateRandomString(length int) string {
+	chars := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+	bts := make([]byte, length)
+
+	if _, err := rand.Read(bts); err != nil {
+		return ""
+	}
+
+	for i, b := range bts {
+		bts[i] = chars[b%byte(len(chars))]
+	}
+
+	return string(bts)
 }
