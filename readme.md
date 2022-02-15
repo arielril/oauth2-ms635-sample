@@ -4,6 +4,8 @@ This is a CLI that can help testing the configuration from Azure Applications, e
 
 The CLI starts a Go HTTP server listening in the port 3001, by default. 
 
+The execution result will be a log of the `access_token` and `id_token` returned from Microsoft Graph API.
+
 ## Installation
 
 ```sh
