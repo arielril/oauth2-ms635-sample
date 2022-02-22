@@ -38,6 +38,8 @@ For this CLI to work, it is needed to set the redirect URI in the Azure Applicat
 $ oauth2-ms365-sample -state "MyCrazyAuthCode" -client_id "DB6AA2C9-9311-4B82-B8C3-ECBC43CD56BB" -client_secret "C2186546-B88E-4627-BC3B-5313C1E0ECE7" -scope "openid" -tenant "B78B2739-5EA6-487D-83E3-33D6253559FA"
 
 [INF] open this URL in your browser to start the flow: https://login.microsoftonline.com/B78B2739-5EA6-487D-83E3-33D6253559FA/oauth2/v2.0/authorize?client_id=DB6AA2C9-9311-4B82-B8C3-ECBC43CD56BB&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Ftoken&response_mode=query&scope=openid&state=MyCrazyAuthCode
-
-...[snip]...
+[AUT] received state: [MyCrazyAuthCode]
+[AUT] received ID Token: []
+[TOK] received access token: [<access_token_jwt>]
+[TOK] received ID token: [<id_token_jwt>]
 ```
