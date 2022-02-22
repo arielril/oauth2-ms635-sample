@@ -93,8 +93,8 @@ func handleAuthCode(opts ExecOpts) func(rw http.ResponseWriter, r *http.Request)
 				return
 			}
 
-			logger.Print().Msgf("received state: %v", qs["state"])
-			logger.Print().Msgf("received ID Token: %v", qs["id_token"])
+			logger.Print().Label("AUT").Msgf("received state: %v", qs["state"])
+			logger.Print().Label("AUT").Msgf("received ID Token: %v", qs["id_token"])
 
 			accessToken := getAccessToken(
 				opts.Tenant,
@@ -104,8 +104,8 @@ func handleAuthCode(opts ExecOpts) func(rw http.ResponseWriter, r *http.Request)
 				opts.RedirectURI,
 			)
 
-			logger.Print().Msgf("received access token: [%v]", accessToken.AccessToken)
-			logger.Print().Msgf("received ID token: [%v]", accessToken.IDToken)
+			logger.Print().Label("TOK").Msgf("received access token: [%v]\n", accessToken.AccessToken)
+			logger.Print().Label("TOK").Msgf("received ID token: [%v]", accessToken.IDToken)
 		}
 
 		rw.WriteHeader(http.StatusAccepted)
@@ -143,8 +143,6 @@ func getAccessToken(tenant, clientId, scope, code, clientSecret, redirectURI str
 		logger.Error().Msgf("failed to decode response. error: %v", err)
 		return AccessTokenResponseOK{}
 	}
-
-	logger.Print().Msgf("access token response: %#v", respBody)
 
 	return respBody
 }
