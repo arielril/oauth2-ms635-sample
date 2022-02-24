@@ -9,7 +9,7 @@ The execution result will be a log of the `access_token` and `id_token` returned
 ## Installation
 
 ```sh
-$ go install -v github.com/arielril/oauth2-ms365-sample
+$ go install -v github.com/arielril/oauth2-ms365-sample@latest
 ```
 
 ## Usage
