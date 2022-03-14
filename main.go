@@ -10,6 +10,7 @@ import (
 	"net/url"
 
 	"github.com/arielril/oauth2-ms365-sample/log"
+	"github.com/pkg/browser"
 )
 
 var logger = log.GetInstance()
@@ -74,12 +75,17 @@ func main() {
 		"https://login.microsoftonline.com/%v/oauth2/v2.0/authorize?client_id=%v&response_type=code&redirect_uri=%v&response_mode=query&scope=%v&state=%v",
 		opts.Tenant, opts.ClientID, url.QueryEscape(opts.RedirectURI), url.QueryEscape(opts.Scope), url.QueryEscape(opts.State),
 	)
-	logger.Info().Msgf("open this URL in your browser to start the flow: %v", urlToOpen)
+	logger.Info().Msgf("this URL will open on your browser to start the flow:\n\t%v\n", urlToOpen)
+
+	err := browser.OpenURL(urlToOpen)
+	if err != nil {
+		logger.Warning().Msgf("could not open url in browser. please copy and open manually. error: %v\n", err)
+	}
 
 	http.HandleFunc("/token", handleAuthCode(opts))
 
 	if err := http.ListenAndServe(":3001", nil); err != nil {
-		logger.Fatal().Msgf("server failed: %v", err)
+		logger.Fatal().Msgf("server failed: %v\n", err)
 	}
 }
 
@@ -89,12 +95,12 @@ func handleAuthCode(opts ExecOpts) func(rw http.ResponseWriter, r *http.Request)
 			qs := r.URL.Query()
 
 			if qs["error"] != nil {
-				logger.Warning().Msgf("failed to auth on Office365: %v", qs["error_description"])
+				logger.Warning().Msgf("failed to auth on Office365: %v\n", qs["error_description"])
 				return
 			}
 
-			logger.Print().Label("AUT").Msgf("received state: %v", qs["state"])
-			logger.Print().Label("AUT").Msgf("received ID Token: %v", qs["id_token"])
+			logger.Print().Label("AUT").Msgf("received state: %v\n", qs["state"])
+			logger.Print().Label("AUT").Msgf("received ID Token: %v\n", qs["id_token"])
 
 			accessToken := getAccessToken(
 				opts.Tenant,
@@ -105,7 +111,7 @@ func handleAuthCode(opts ExecOpts) func(rw http.ResponseWriter, r *http.Request)
 			)
 
 			logger.Print().Label("TOK").Msgf("received access token: [%v]\n", accessToken.AccessToken)
-			logger.Print().Label("TOK").Msgf("received ID token: [%v]", accessToken.IDToken)
+			logger.Print().Label("TOK").Msgf("received ID token: [%v]\n", accessToken.IDToken)
 		}
 
 		rw.WriteHeader(http.StatusAccepted)
@@ -126,13 +132,13 @@ func getAccessToken(tenant, clientId, scope, code, clientSecret, redirectURI str
 		},
 	)
 	if err != nil {
-		logger.Error().Msgf("failed to get access token. error: %v", err)
+		logger.Error().Msgf("failed to get access token. error: %v\n", err)
 		return AccessTokenResponseOK{}
 	}
 
 	d, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logger.Error().Msgf("failed to get access token. error: %v", err)
+		logger.Error().Msgf("failed to get access token. error: %v\n", err)
 		return AccessTokenResponseOK{}
 	}
 	defer func() { resp.Body.Close() }()
@@ -140,7 +146,7 @@ func getAccessToken(tenant, clientId, scope, code, clientSecret, redirectURI str
 	var respBody AccessTokenResponseOK
 
 	if err = json.Unmarshal(d, &respBody); err != nil {
-		logger.Error().Msgf("failed to decode response. error: %v", err)
+		logger.Error().Msgf("failed to decode response. error: %v\n", err)
 		return AccessTokenResponseOK{}
 	}
 
